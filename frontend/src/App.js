@@ -6,15 +6,26 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 function App() {
   const [seats, setSeats] = useState(1);
+  const [customerId, setCustomerId] = useState('');
 
-  const handleClick = async () => {
+  const handleCheckoutClick = async () => {
     try {
-      const response = await axios.post('http://localhost:4242/create-checkout-session', { seats });
+      const response = await axios.post('http://localhost:3001/create-checkout-session', { seats });
       const { id } = response.data;
       const stripe = await stripePromise;
       await stripe.redirectToCheckout({ sessionId: id });
     } catch (error) {
       console.error('Error creating checkout session:', error);
+    }
+  };
+
+  const handleManageSubscriptionClick = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/create-customer-portal-session', { customerId });
+      const { url } = response.data;
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error creating customer portal session:', error);
     }
   };
 
@@ -28,7 +39,16 @@ function App() {
         min="1"
         style={styles.input}
       />
-      <button onClick={handleClick} style={styles.button}>Checkout</button>
+      <button onClick={handleCheckoutClick} style={styles.button}>Checkout</button>
+      <h2 style={styles.header}>Manage Your Subscription</h2>
+      <input
+        type="text"
+        value={customerId}
+        onChange={(e) => setCustomerId(e.target.value)}
+        placeholder="Enter your customer ID"
+        style={styles.input}
+      />
+      <button onClick={handleManageSubscriptionClick} style={styles.button}>Manage Subscription</button>
     </div>
   );
 }
@@ -43,22 +63,17 @@ const styles = {
     backgroundColor: '#f0f0f0',
   },
   header: {
+    fontSize: '24px',
     marginBottom: '20px',
   },
   input: {
     padding: '10px',
-    fontSize: '16px',
     marginBottom: '20px',
-    width: '200px',
-    textAlign: 'center',
+    fontSize: '16px',
   },
   button: {
     padding: '10px 20px',
     fontSize: '16px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
     cursor: 'pointer',
   },
 };
