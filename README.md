@@ -5,7 +5,7 @@ This project is a simple fullstack application built with React for the frontend
 ## Project Structure
 
 ```
-my-fullstack-app
+stripe-seat-billing-app
 ├── backend
 │   ├── .env
 │   ├── src
